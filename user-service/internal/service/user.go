@@ -13,7 +13,14 @@ type User struct {
 	repoUser *repository.User
 }
 
-func NewUser(repoUser *repository.User) *User {
+type UserService interface {
+	GetByID(ctx context.Context, id string) (*model.User, error)
+	Create(ctx context.Context, user *model.User) error
+	Update(ctx context.Context, id string, user *model.User) error
+	Delete(ctx context.Context, id string) error
+}
+
+func NewUser(repoUser *repository.User) UserService {
 	return &User{repoUser: repoUser}
 }
 
