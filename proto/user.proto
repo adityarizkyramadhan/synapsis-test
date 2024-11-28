@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "./user-service/internal/handler/grpc;user";
+
+import "google/protobuf/empty.proto";
+
+service UserHandler {
+  rpc GetByID(GetByIDRequest) returns (User) {}
+  rpc Create(User) returns (google.protobuf.Empty) {}
+  rpc Update(UpdateUserRequest) returns (google.protobuf.Empty) {}
+  rpc Delete(DeleteUserRequest) returns (google.protobuf.Empty) {}
+}
+
+message User {
+  uint32 id = 1;
+  string email = 2;
+  string password = 3;
+  string created_at = 4;
+  string updated_at = 5;
+}
+
+message GetByIDRequest {
+  string id = 1;
+}
+
+message UpdateUserRequest {
+  string id = 1;
+  User user = 2;
+}
+
+message DeleteUserRequest {
+  string id = 1;
+}
