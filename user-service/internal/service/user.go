@@ -10,7 +10,7 @@ import (
 )
 
 type User struct {
-	repoUser *repository.User
+	repoUser repository.UserRepository
 }
 
 type UserService interface {
@@ -20,7 +20,7 @@ type UserService interface {
 	Delete(ctx context.Context, id string) error
 }
 
-func NewUser(repoUser *repository.User) UserService {
+func NewUser(repoUser repository.UserRepository) UserService {
 	return &User{repoUser: repoUser}
 }
 

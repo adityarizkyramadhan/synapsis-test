@@ -9,10 +9,10 @@ import (
 )
 
 type User struct {
-	serviceUser *service.User
+	serviceUser service.UserService
 }
 
-func NewUser(serviceUser *service.User) *User {
+func NewUser(serviceUser service.UserService) *User {
 	return &User{serviceUser: serviceUser}
 }
 
