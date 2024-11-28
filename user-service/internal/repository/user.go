@@ -17,8 +17,15 @@ type User struct {
 	redis *redis.Client
 }
 
-func NewUser(db *gorm.DB, redis *redis.Client) *User {
+func NewUser(db *gorm.DB, redis *redis.Client) UserRepository {
 	return &User{db: db, redis: redis}
+}
+
+type UserRepository interface {
+	GetByID(ctx context.Context, id uint) (*model.User, error)
+	Create(ctx context.Context, user *model.User) error
+	Update(ctx context.Context, id uint, user *model.User) error
+	Delete(ctx context.Context, id uint) error
 }
 
 func (u *User) GetByID(ctx context.Context, id uint) (*model.User, error) {
