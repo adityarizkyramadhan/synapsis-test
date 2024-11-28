@@ -34,15 +34,7 @@ func JWTMiddleware() gin.HandlerFunc {
 			ctx.Abort()
 			return
 		}
-		role, ok := mapClaims["role"].(string)
-		if !ok {
-			utils.ErrorResponse(ctx, http.StatusUnauthorized, "role not found in token")
-			ctx.Abort()
-			return
-		}
-		ctx.Set("id", mapClaims["id"])
-		ctx.Set("role", role)
-		ctx.Set("email", mapClaims["username"])
+		ctx.Set("id", mapClaims["id"].(string))
 		ctx.Next()
 	}
 }
