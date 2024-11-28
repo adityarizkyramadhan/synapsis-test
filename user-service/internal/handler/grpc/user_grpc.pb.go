@@ -9,10 +9,10 @@ package user
 import (
 	context "context"
 
+	"github.com/adityarizkyramadhan/synapsis-test/user-service/internal/model"
 	"github.com/adityarizkyramadhan/synapsis-test/user-service/internal/service"
+	"golang.org/x/crypto/bcrypt"
 	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -110,18 +110,61 @@ func NewUserHandlerServer(serviceUser service.UserService) UserHandlerServer {
 	return &UserHandlerServerStruct{serviceUser: serviceUser}
 }
 
-func (u *UserHandlerServerStruct) GetByID(context.Context, *GetByIDRequest) (*User, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetByID not implemented")
+func (u *UserHandlerServerStruct) GetByID(ctx context.Context,ID *GetByIDRequest) (*User, error) {
+	user, err :=  u.serviceUser.GetByID(ctx, ID.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &User{
+		Id: user.ID,
+		Email: user.Email,
+		CreatedAt: user.CreatedAt.String(),
+		UpdatedAt: user.UpdatedAt.String(),
+	}, nil
 }
-func (u *UserHandlerServerStruct) Create(context.Context, *User) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+func (u *UserHandlerServerStruct) Create(ctx context.Context,in *User) (*emptypb.Empty, error) {
+	password, err := bcrypt.GenerateFromPassword([]byte(in.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+	user := &model.User{
+		Email: in.Email,
+		Password: string(password),
+	}
+
+	err = u.serviceUser.Create(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
 }
-func (u *UserHandlerServerStruct) Update(context.Context, *UpdateUserRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+func (u *UserHandlerServerStruct) Update(ctx context.Context,in *UpdateUserRequest) (*emptypb.Empty, error) {
+	password, err := bcrypt.GenerateFromPassword([]byte(in.User.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+	user := &model.User{
+		Email: in.User.Email,
+		Password: string(password),
+	}
+
+	err = u.serviceUser.Update(ctx, in.Id, user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
+
 }
-func (u *UserHandlerServerStruct) Delete(context.Context, *DeleteUserRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+func (u *UserHandlerServerStruct) Delete(ctx context.Context,in *DeleteUserRequest) (*emptypb.Empty, error) {
+	err := u.serviceUser.Delete(ctx, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
 }
+
 func (UserHandlerServerStruct) mustEmbedUnimplementedUserHandlerServer() {}
 func (UserHandlerServerStruct) testEmbeddedByValue()                     {}
 
