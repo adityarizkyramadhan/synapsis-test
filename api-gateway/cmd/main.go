@@ -29,6 +29,13 @@ func main() {
 		log.Fatalf("failed to initialize user handler: %v", err)
 	}
 
+	authorGroup := router.Group("/author")
+	authorHandler := httpHandler.NewAuthorRoutes()
+
+	if err := authorHandler.Init(authorGroup); err != nil {
+		log.Fatalf("failed to initialize author handler: %v", err)
+	}
+
 	srv := &http.Server{
 		Addr:    ":8080",
 		Handler: router,
