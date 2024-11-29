@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package user;
 
-option go_package = "./user-service/internal/handler/grpc;user";
+option go_package = "./grpc;user";
 
 import "google/protobuf/empty.proto";
 
