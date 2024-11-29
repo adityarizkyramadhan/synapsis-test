@@ -24,6 +24,7 @@ const (
 	UserHandler_Create_FullMethodName  = "/user.UserHandler/Create"
 	UserHandler_Update_FullMethodName  = "/user.UserHandler/Update"
 	UserHandler_Delete_FullMethodName  = "/user.UserHandler/Delete"
+	UserHandler_Login_FullMethodName   = "/user.UserHandler/Login"
 )
 
 // UserHandlerClient is the client API for UserHandler service.
@@ -34,6 +35,7 @@ type UserHandlerClient interface {
 	Create(ctx context.Context, in *User, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Update(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Delete(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Login(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
 }
 
 type userHandlerClient struct {
@@ -84,6 +86,16 @@ func (c *userHandlerClient) Delete(ctx context.Context, in *DeleteUserRequest, o
 	return out, nil
 }
 
+func (c *userHandlerClient) Login(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(User)
+	err := c.cc.Invoke(ctx, UserHandler_Login_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserHandlerServer is the server API for UserHandler service.
 // All implementations must embed UnimplementedUserHandlerServer
 // for forward compatibility.
@@ -92,6 +104,7 @@ type UserHandlerServer interface {
 	Create(context.Context, *User) (*emptypb.Empty, error)
 	Update(context.Context, *UpdateUserRequest) (*emptypb.Empty, error)
 	Delete(context.Context, *DeleteUserRequest) (*emptypb.Empty, error)
+	Login(context.Context, *User) (*User, error)
 	mustEmbedUnimplementedUserHandlerServer()
 }
 
@@ -113,6 +126,9 @@ func (UnimplementedUserHandlerServer) Update(context.Context, *UpdateUserRequest
 }
 func (UnimplementedUserHandlerServer) Delete(context.Context, *DeleteUserRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedUserHandlerServer) Login(context.Context, *User) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
 func (UnimplementedUserHandlerServer) mustEmbedUnimplementedUserHandlerServer() {}
 func (UnimplementedUserHandlerServer) testEmbeddedByValue()                     {}
@@ -207,6 +223,24 @@ func _UserHandler_Delete_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserHandler_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(User)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserHandlerServer).Login(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserHandler_Login_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserHandlerServer).Login(ctx, req.(*User))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserHandler_ServiceDesc is the grpc.ServiceDesc for UserHandler service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -229,6 +263,10 @@ var UserHandler_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _UserHandler_Delete_Handler,
+		},
+		{
+			MethodName: "Login",
+			Handler:    _UserHandler_Login_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

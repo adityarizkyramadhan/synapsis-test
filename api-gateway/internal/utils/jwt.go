@@ -8,7 +8,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenerateToken(id uint) (string, error) {
+func GenerateToken(id uint32) (string, error) {
 	secretKey := os.Getenv("SECRET_KEY")
 	if secretKey == "" {
 		return "", errors.New("SECRET_KEY environment variable not set")

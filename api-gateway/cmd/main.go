@@ -10,11 +10,15 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 
 	httpHandler "github.com/adityarizkyramadhan/synapsis-test/api-gateway/internal/handler/http"
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("failed to load env")
+	}
 	router := gin.New()
 
 	userGroup := router.Group("/user")

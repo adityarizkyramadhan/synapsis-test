@@ -21,6 +21,27 @@ func NewUser(serviceUser service.UserService) *User {
 	return &User{serviceUser: serviceUser}
 }
 
+func (u *User) Login(ctx context.Context, in *pb.User) (*pb.User, error) {
+	user := &model.User{
+		Email:    in.Email,
+		Password: in.Password,
+	}
+	dataUser, err := u.serviceUser.Login(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(dataUser.Password), []byte(user.Password))
+	if err != nil {
+		return nil, err
+	}
+	return &pb.User{
+		Id:        dataUser.ID,
+		Email:     dataUser.Email,
+		CreatedAt: dataUser.CreatedAt.String(),
+		UpdatedAt: dataUser.UpdatedAt.String(),
+	}, nil
+}
+
 func (u *User) GetByID(ctx context.Context, ID *pb.GetByIDRequest) (*pb.User, error) {
 	user, err := u.serviceUser.GetByID(ctx, ID.Id)
 	if err != nil {

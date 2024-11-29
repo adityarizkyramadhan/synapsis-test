@@ -29,14 +29,14 @@ type UserRepository interface {
 }
 
 func (u *User) Login(ctx context.Context, user *model.User) (*model.User, error) {
-	var dataUser *model.User
-	err := u.db.WithContext(ctx).Where("email = ?", user.Email).First(dataUser).Error
+	var dataUser model.User
+	err := u.db.WithContext(ctx).Where("email = ?", user.Email).First(&dataUser).Error
 
 	if err != nil {
 		return nil, err
 	}
 
-	return dataUser, nil
+	return &dataUser, nil
 }
 
 func (u *User) GetByID(ctx context.Context, id uint) (*model.User, error) {

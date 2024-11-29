@@ -25,7 +25,8 @@ func (u *UserRoutes) Init(router *gin.RouterGroup) error {
 
 	u.client = pb.NewUserHandlerClient(conn)
 
-	router.POST("/", u.Create)
+	router.POST("/register", u.Create)
+	router.POST("/login", u.Login)
 
 	return nil
 }
@@ -49,4 +50,30 @@ func (u *UserRoutes) Create(ctx *gin.Context) {
 	}
 
 	utils.ResponseSuccess(ctx, 200, "User created")
+}
+
+func (u *UserRoutes) Login(ctx *gin.Context) {
+	var input dto.UserInput
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		utils.ResponseError(ctx, 400, err)
+		return
+	}
+
+	user, err := u.client.Login(ctx, &pb.User{
+		Password: input.Password,
+		Email:    input.Email,
+	})
+
+	if err != nil {
+		utils.ResponseError(ctx, 500, err)
+		return
+	}
+
+	token, err := utils.GenerateToken(user.Id)
+	if err != nil {
+		utils.ResponseError(ctx, 500, err)
+		return
+	}
+
+	utils.ResponseSuccess(ctx, 200, token)
 }
