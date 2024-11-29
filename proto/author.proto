@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package author;
+
+option go_package = "./grpc;author";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service AuthorHandler {
+  rpc GetByID(GetByIDRequest) returns (Author) {}
+  rpc Create(Author) returns (google.protobuf.Empty) {}
+  rpc Update(UpdateAuthorRequest) returns (google.protobuf.Empty) {}
+  rpc Delete(DeleteAuthorRequest) returns (google.protobuf.Empty) {}
+  rpc ListAll(google.protobuf.Empty) returns (ListAuthorsResponse) {}
+}
+
+message Author {
+  uint32 id = 1;
+  string name = 2;
+  string email = 3;
+  string bio = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message GetByIDRequest {
+  uint32 id = 1;
+}
+
+message UpdateAuthorRequest {
+  uint32 id = 1;
+  Author author = 2;
+}
+
+message DeleteAuthorRequest {
+  uint32 id = 1;
+}
+
+message ListAuthorsResponse {
+  repeated Author authors = 1;
+}
