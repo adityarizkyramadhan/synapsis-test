@@ -8,11 +8,9 @@ package user
 
 import (
 	context "context"
-
-	"github.com/adityarizkyramadhan/synapsis-test/user-service/internal/model"
-	"github.com/adityarizkyramadhan/synapsis-test/user-service/internal/service"
-	"golang.org/x/crypto/bcrypt"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -26,6 +24,7 @@ const (
 	UserHandler_Create_FullMethodName  = "/user.UserHandler/Create"
 	UserHandler_Update_FullMethodName  = "/user.UserHandler/Update"
 	UserHandler_Delete_FullMethodName  = "/user.UserHandler/Delete"
+	UserHandler_Login_FullMethodName   = "/user.UserHandler/Login"
 )
 
 // UserHandlerClient is the client API for UserHandler service.
@@ -36,6 +35,7 @@ type UserHandlerClient interface {
 	Create(ctx context.Context, in *User, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Update(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Delete(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Login(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
 }
 
 type userHandlerClient struct {
@@ -86,6 +86,16 @@ func (c *userHandlerClient) Delete(ctx context.Context, in *DeleteUserRequest, o
 	return out, nil
 }
 
+func (c *userHandlerClient) Login(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(User)
+	err := c.cc.Invoke(ctx, UserHandler_Login_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserHandlerServer is the server API for UserHandler service.
 // All implementations must embed UnimplementedUserHandlerServer
 // for forward compatibility.
@@ -94,6 +104,7 @@ type UserHandlerServer interface {
 	Create(context.Context, *User) (*emptypb.Empty, error)
 	Update(context.Context, *UpdateUserRequest) (*emptypb.Empty, error)
 	Delete(context.Context, *DeleteUserRequest) (*emptypb.Empty, error)
+	Login(context.Context, *User) (*User, error)
 	mustEmbedUnimplementedUserHandlerServer()
 }
 
@@ -102,71 +113,25 @@ type UserHandlerServer interface {
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UserHandlerServerStruct struct{
-	serviceUser service.UserService
+type UnimplementedUserHandlerServer struct{}
+
+func (UnimplementedUserHandlerServer) GetByID(context.Context, *GetByIDRequest) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetByID not implemented")
 }
-
-func NewUserHandlerServer(serviceUser service.UserService) UserHandlerServer {
-	return &UserHandlerServerStruct{serviceUser: serviceUser}
+func (UnimplementedUserHandlerServer) Create(context.Context, *User) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
-
-func (u *UserHandlerServerStruct) GetByID(ctx context.Context,ID *GetByIDRequest) (*User, error) {
-	user, err :=  u.serviceUser.GetByID(ctx, ID.Id)
-	if err != nil {
-		return nil, err
-	}
-	return &User{
-		Id: user.ID,
-		Email: user.Email,
-		CreatedAt: user.CreatedAt.String(),
-		UpdatedAt: user.UpdatedAt.String(),
-	}, nil
+func (UnimplementedUserHandlerServer) Update(context.Context, *UpdateUserRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
-func (u *UserHandlerServerStruct) Create(ctx context.Context,in *User) (*emptypb.Empty, error) {
-	password, err := bcrypt.GenerateFromPassword([]byte(in.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
-	user := &model.User{
-		Email: in.Email,
-		Password: string(password),
-	}
-
-	err = u.serviceUser.Create(ctx, user)
-	if err != nil {
-		return nil, err
-	}
-
-	return &emptypb.Empty{}, nil
+func (UnimplementedUserHandlerServer) Delete(context.Context, *DeleteUserRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
-func (u *UserHandlerServerStruct) Update(ctx context.Context,in *UpdateUserRequest) (*emptypb.Empty, error) {
-	password, err := bcrypt.GenerateFromPassword([]byte(in.User.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
-	user := &model.User{
-		Email: in.User.Email,
-		Password: string(password),
-	}
-
-	err = u.serviceUser.Update(ctx, in.Id, user)
-	if err != nil {
-		return nil, err
-	}
-
-	return &emptypb.Empty{}, nil
-
+func (UnimplementedUserHandlerServer) Login(context.Context, *User) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
-func (u *UserHandlerServerStruct) Delete(ctx context.Context,in *DeleteUserRequest) (*emptypb.Empty, error) {
-	err := u.serviceUser.Delete(ctx, in.Id)
-	if err != nil {
-		return nil, err
-	}
-	return &emptypb.Empty{}, nil
-}
-
-func (UserHandlerServerStruct) mustEmbedUnimplementedUserHandlerServer() {}
-func (UserHandlerServerStruct) testEmbeddedByValue()                     {}
+func (UnimplementedUserHandlerServer) mustEmbedUnimplementedUserHandlerServer() {}
+func (UnimplementedUserHandlerServer) testEmbeddedByValue()                     {}
 
 // UnsafeUserHandlerServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to UserHandlerServer will
@@ -258,6 +223,24 @@ func _UserHandler_Delete_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserHandler_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(User)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserHandlerServer).Login(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserHandler_Login_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserHandlerServer).Login(ctx, req.(*User))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserHandler_ServiceDesc is the grpc.ServiceDesc for UserHandler service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -280,6 +263,10 @@ var UserHandler_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _UserHandler_Delete_Handler,
+		},
+		{
+			MethodName: "Login",
+			Handler:    _UserHandler_Login_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

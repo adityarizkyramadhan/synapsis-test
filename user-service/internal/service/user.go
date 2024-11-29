@@ -17,10 +17,19 @@ type UserService interface {
 	Create(ctx context.Context, user *model.User) error
 	Update(ctx context.Context, id string, user *model.User) error
 	Delete(ctx context.Context, id string) error
+	Login(ctx context.Context, user *model.User) (*model.User, error)
 }
 
 func NewUser(repoUser repository.UserRepository) UserService {
 	return &User{repoUser: repoUser}
+}
+
+func (u *User) Login(ctx context.Context, user *model.User) (*model.User, error) {
+	dataUser, err := u.repoUser.Login(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+	return dataUser, nil
 }
 
 func (u *User) GetByID(ctx context.Context, id string) (*model.User, error) {

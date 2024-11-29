@@ -11,6 +11,7 @@ service UserHandler {
   rpc Create(User) returns (google.protobuf.Empty) {}
   rpc Update(UpdateUserRequest) returns (google.protobuf.Empty) {}
   rpc Delete(DeleteUserRequest) returns (google.protobuf.Empty) {}
+  rpc Login(User) returns (User) {}
 }
 
 message User {

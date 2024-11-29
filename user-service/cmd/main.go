@@ -8,6 +8,7 @@ import (
 	"github.com/adityarizkyramadhan/synapsis-test/user-service/config/cache"
 	"github.com/adityarizkyramadhan/synapsis-test/user-service/config/database"
 	pb "github.com/adityarizkyramadhan/synapsis-test/user-service/internal/handler/grpc"
+	grpcImplementation "github.com/adityarizkyramadhan/synapsis-test/user-service/internal/handler/grpc/implementation"
 	"github.com/adityarizkyramadhan/synapsis-test/user-service/internal/model"
 	"github.com/adityarizkyramadhan/synapsis-test/user-service/internal/repository"
 	"github.com/adityarizkyramadhan/synapsis-test/user-service/internal/service"
@@ -34,10 +35,9 @@ func main() {
 	}
 	repoUser := repository.NewUser(db, redis)
 	serviceUser := service.NewUser(repoUser)
-	handlerUser := pb.NewUserHandlerServer(serviceUser)
-
+	grpcHandler := grpcImplementation.NewUser(serviceUser)
 	grpcServer := grpc.NewServer()
-	pb.RegisterUserHandlerServer(grpcServer, handlerUser)
+	pb.RegisterUserHandlerServer(grpcServer, grpcHandler)
 	listener, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
