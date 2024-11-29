@@ -33,3 +33,10 @@ func NewDB() (*gorm.DB, error) {
 	dbGlobal = db
 	return dbGlobal, nil
 }
+
+func AutoMigrate(model ...interface{}) error {
+	if dbGlobal == nil {
+		return fmt.Errorf("db is not initialized")
+	}
+	return dbGlobal.AutoMigrate(model...)
+}
