@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"errors"
 	"time"
 
@@ -9,8 +10,8 @@ import (
 )
 
 type Borrowing interface {
-	Borrow(borrow *model.Borrowing) (*model.Borrowing, error)
-	Return(borrow *model.Borrowing) (*model.Borrowing, error)
+	Borrow(ctx context.Context, borrow *model.Borrowing) (*model.Borrowing, error)
+	Return(ctx context.Context, borrow *model.Borrowing) (*model.Borrowing, error)
 }
 
 type borrowing struct {
@@ -21,14 +22,14 @@ func NewBorrowing(db *gorm.DB) *borrowing {
 	return &borrowing{db}
 }
 
-func (b *borrowing) Borrow(borrow *model.Borrowing) (*model.Borrowing, error) {
-	tx := b.db.Begin()
+func (b *borrowing) Borrow(ctx context.Context, borrow *model.Borrowing) (*model.Borrowing, error) {
+	tx := b.db.WithContext(ctx).Begin()
 	if err := tx.Error; err != nil {
 		return nil, err
 	}
 
 	var book model.Book
-	if err := tx.Where("id = ?", borrow.BookID).First(&book).Error; err != nil {
+	if err := tx.WithContext(ctx).Where("id = ?", borrow.BookID).First(&book).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -39,14 +40,14 @@ func (b *borrowing) Borrow(borrow *model.Borrowing) (*model.Borrowing, error) {
 	}
 
 	book.Stock -= borrow.Amount
-	if err := tx.Save(&book).Error; err != nil {
+	if err := tx.WithContext(ctx).Save(&book).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
 
 	borrow.BorrowedAt = time.Now()
 
-	if err := tx.Create(borrow).Error; err != nil {
+	if err := tx.WithContext(ctx).Create(borrow).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -59,27 +60,33 @@ func (b *borrowing) Borrow(borrow *model.Borrowing) (*model.Borrowing, error) {
 	return borrow, nil
 }
 
-func (b *borrowing) Return(borrow *model.Borrowing) (*model.Borrowing, error) {
-	tx := b.db.Begin()
+func (b *borrowing) Return(ctx context.Context, borrow *model.Borrowing) (*model.Borrowing, error) {
+	tx := b.db.WithContext(ctx).Begin()
 	if err := tx.Error; err != nil {
 		return nil, err
 	}
 
+	var borrowData model.Borrowing
+	if err := tx.WithContext(ctx).Where("id = ?", borrow.ID).First(&borrowData).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
 	var book model.Book
-	if err := tx.Where("id = ?", borrow.BookID).First(&book).Error; err != nil {
+	if err := tx.WithContext(ctx).Where("id = ?", borrowData.BookID).First(&book).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
 
-	book.Stock += borrow.Amount
-	if err := tx.Save(&book).Error; err != nil {
+	book.Stock += borrowData.Amount
+	if err := tx.WithContext(ctx).Save(&book).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
 
-	borrow.ReturnedAt = time.Now()
+	borrowData.ReturnedAt = time.Now()
 
-	if err := tx.Save(borrow).Error; err != nil {
+	if err := tx.WithContext(ctx).Save(&borrowData).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -89,5 +96,5 @@ func (b *borrowing) Return(borrow *model.Borrowing) (*model.Borrowing, error) {
 		return nil, err
 	}
 
-	return borrow, nil
+	return &borrowData, nil
 }

@@ -30,5 +30,5 @@ message BorrowRequest {
 
 message ReturnRequest {
   uint32 borrowing_id = 1;
-  google.protobuf.Timestamp returned_at = 2;
+  uint32 user_id = 2;
 }
