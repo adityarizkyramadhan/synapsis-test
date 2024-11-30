@@ -48,6 +48,18 @@ func main() {
 		log.Fatalf("failed to initialize book handler: %v", err)
 	}
 
+	categoryBookGroup := router.Group("/category-book")
+	categoryBookHandler := httpHandler.NewCategoryBook()
+	if err := categoryBookHandler.Init(categoryBookGroup); err != nil {
+		log.Fatalf("failed to initialize category book handler: %v", err)
+	}
+
+	borrowingGroup := router.Group("/borrowing")
+	borrowingHandler := httpHandler.NewBorrowingRoutes()
+	if err := borrowingHandler.Init(borrowingGroup); err != nil {
+		log.Fatalf("failed to initialize borrowing handler: %v", err)
+	}
+
 	srv := &http.Server{
 		Addr:    ":8080",
 		Handler: router,
