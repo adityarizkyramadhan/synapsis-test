@@ -3,6 +3,7 @@ package http
 import (
 	"errors"
 	"net/http"
+	"os"
 	"strconv"
 
 	pbCategory "github.com/adityarizkyramadhan/synapsis-test/api-gateway/internal/client/category/grpc"
@@ -23,7 +24,7 @@ func NewCategoryRoutes() *CategoryRoutes {
 }
 
 func (c *CategoryRoutes) Init(router *gin.RouterGroup) error {
-	conn, err := grpc.NewClient("localhost:50053", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(os.Getenv("URL_CATEGORY"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
 	}

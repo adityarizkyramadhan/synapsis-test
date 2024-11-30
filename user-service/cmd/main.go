@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net"
+	"os"
 
 	"github.com/adityarizkyramadhan/synapsis-test/user-service/config/cache"
 	"github.com/adityarizkyramadhan/synapsis-test/user-service/config/database"
@@ -38,11 +39,11 @@ func main() {
 	grpcHandler := grpcImplementation.NewUser(serviceUser)
 	grpcServer := grpc.NewServer()
 	pb.RegisterUserHandlerServer(grpcServer, grpcHandler)
-	listener, err := net.Listen("tcp", ":50051")
+	listener, err := net.Listen("tcp", os.Getenv("GRPC_PORT"))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	log.Println("gRPC server is running on port 50051")
+	log.Println("gRPC server is running on port " + os.Getenv("GRPC_PORT"))
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

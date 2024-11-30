@@ -3,6 +3,7 @@ package http
 import (
 	"errors"
 	"net/http"
+	"os"
 	"strconv"
 
 	pbAuthor "github.com/adityarizkyramadhan/synapsis-test/api-gateway/internal/client/author/grpc"
@@ -23,7 +24,7 @@ func NewAuthorRoutes() *AuthorRoutes {
 }
 
 func (a *AuthorRoutes) Init(router *gin.RouterGroup) error {
-	conn, err := grpc.NewClient("localhost:50052", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(os.Getenv("URL_AUTHOR"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
 	}

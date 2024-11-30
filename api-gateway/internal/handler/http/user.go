@@ -1,6 +1,8 @@
 package http
 
 import (
+	"os"
+
 	pb "github.com/adityarizkyramadhan/synapsis-test/api-gateway/internal/client/user/grpc"
 	"github.com/adityarizkyramadhan/synapsis-test/api-gateway/internal/dto"
 	"github.com/adityarizkyramadhan/synapsis-test/api-gateway/internal/utils"
@@ -18,7 +20,7 @@ func NewUserRoutes() *UserRoutes {
 }
 
 func (u *UserRoutes) Init(router *gin.RouterGroup) error {
-	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(os.Getenv("URL_USER"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
 	}

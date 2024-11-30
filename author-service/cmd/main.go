@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net"
+	"os"
 
 	"github.com/adityarizkyramadhan/synapsis-test/author-service/config/database"
 	pb "github.com/adityarizkyramadhan/synapsis-test/author-service/internal/handler/grpc"
@@ -31,11 +32,11 @@ func main() {
 	grpcHandler := grpcImplementation.NewAuthor(serviceAuthor)
 	grpcServer := grpc.NewServer()
 	pb.RegisterAuthorHandlerServer(grpcServer, grpcHandler)
-	listener, err := net.Listen("tcp", ":50052")
+	listener, err := net.Listen("tcp", os.Getenv("GRPC_PORT"))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	log.Println("gRPC server is running on port 50051")
+	log.Println("gRPC server is running on port " + os.Getenv("GRPC_PORT"))
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

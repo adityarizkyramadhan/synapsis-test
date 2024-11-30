@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net"
+	"os"
 
 	"github.com/adityarizkyramadhan/synapsis-test/book-service/config/database"
 	pbBook "github.com/adityarizkyramadhan/synapsis-test/book-service/internal/handler/grpc"
@@ -43,12 +44,12 @@ func main() {
 	grpcHandlerBorrowing := grpcImplementation.NewBorrowing(serviceBorrowing)
 	pbBook.RegisterBorrowingHandlerServer(grpcServer, grpcHandlerBorrowing)
 
-	listener, err := net.Listen("tcp", ":50054")
+	listener, err := net.Listen("tcp", os.Getenv("GRPC_PORT"))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	log.Println("gRPC server is running on port 50051")
+	log.Println("gRPC server is running on port " + os.Getenv("GRPC_PORT"))
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

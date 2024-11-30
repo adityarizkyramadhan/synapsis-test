@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"os"
 	"strconv"
 
 	pbCategoryBook "github.com/adityarizkyramadhan/synapsis-test/api-gateway/internal/client/category_book/grpc"
@@ -22,7 +23,7 @@ func NewCategoryBook() *CategoryBook {
 }
 
 func (c *CategoryBook) Init(router *gin.RouterGroup) error {
-	conn, err := grpc.NewClient("localhost:50053", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(os.Getenv("URL_BOOK"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
 	}
