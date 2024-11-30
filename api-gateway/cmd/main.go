@@ -36,6 +36,14 @@ func main() {
 		log.Fatalf("failed to initialize author handler: %v", err)
 	}
 
+	categoryGroup := router.Group("/category")
+
+	categoryHandler := httpHandler.NewCategoryRoutes()
+
+	if err := categoryHandler.Init(categoryGroup); err != nil {
+		log.Fatalf("failed to initialize category handler: %v", err)
+	}
+
 	srv := &http.Server{
 		Addr:    ":8080",
 		Handler: router,
