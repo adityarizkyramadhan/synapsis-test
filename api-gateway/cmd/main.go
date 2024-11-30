@@ -37,11 +37,15 @@ func main() {
 	}
 
 	categoryGroup := router.Group("/category")
-
 	categoryHandler := httpHandler.NewCategoryRoutes()
-
 	if err := categoryHandler.Init(categoryGroup); err != nil {
 		log.Fatalf("failed to initialize category handler: %v", err)
+	}
+
+	bookGroup := router.Group("/book")
+	bookHandler := httpHandler.NewBookRoutes()
+	if err := bookHandler.Init(bookGroup); err != nil {
+		log.Fatalf("failed to initialize book handler: %v", err)
 	}
 
 	srv := &http.Server{
