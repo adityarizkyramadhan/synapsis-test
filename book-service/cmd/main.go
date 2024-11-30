@@ -43,7 +43,7 @@ func main() {
 	grpcHandlerBorrowing := grpcImplementation.NewBorrowing(serviceBorrowing)
 	pbBook.RegisterBorrowingHandlerServer(grpcServer, grpcHandlerBorrowing)
 
-	listener, err := net.Listen("tcp", ":50053")
+	listener, err := net.Listen("tcp", ":50054")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
