@@ -5,7 +5,7 @@ import (
 	"net"
 
 	"github.com/adityarizkyramadhan/synapsis-test/book-service/config/database"
-	pb "github.com/adityarizkyramadhan/synapsis-test/book-service/internal/handler/grpc"
+	pbBook "github.com/adityarizkyramadhan/synapsis-test/book-service/internal/handler/grpc"
 	grpcImplementation "github.com/adityarizkyramadhan/synapsis-test/book-service/internal/handler/grpc/implementation"
 	"github.com/adityarizkyramadhan/synapsis-test/book-service/internal/model"
 	"github.com/adityarizkyramadhan/synapsis-test/book-service/internal/repository"
@@ -31,7 +31,12 @@ func main() {
 	serviceBook := service.NewBook(repoBook)
 	grpcHandler := grpcImplementation.NewBook(serviceBook)
 	grpcServer := grpc.NewServer()
-	pb.RegisterBookHandlerServer(grpcServer, grpcHandler)
+	pbBook.RegisterBookHandlerServer(grpcServer, grpcHandler)
+
+	repoCategoryBook := repository.NewCategoryBook(db)
+	serviceCategoryBook := service.NewCategoryBook(repoCategoryBook)
+	grpcHandlerCategoryBook := grpcImplementation.NewCategoryBook(serviceCategoryBook)
+	pbBook.RegisterCategoryBookHandlerServer(grpcServer, grpcHandlerCategoryBook)
 
 	listener, err := net.Listen("tcp", ":50053")
 	if err != nil {
