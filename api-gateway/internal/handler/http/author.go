@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	pbAuthor "github.com/adityarizkyramadhan/synapsis-test/api-gateway/internal/client/author/grpc"
 	"github.com/adityarizkyramadhan/synapsis-test/api-gateway/internal/dto"
@@ -30,11 +31,11 @@ func (a *AuthorRoutes) Init(router *gin.RouterGroup) error {
 	}
 	a.authorClient = pbAuthor.NewAuthorHandlerClient(conn)
 
-	router.POST("/authors", middleware.JWTMiddleware(), a.Create)
-	router.PUT("/authors/:id", middleware.JWTMiddleware(), a.Update)
-	router.DELETE("/authors/:id", middleware.JWTMiddleware(), a.Delete)
-	router.GET("/authors/:id", middleware.JWTMiddleware(), a.GetByID)
-	router.GET("/authors", middleware.JWTMiddleware(), a.GetAll)
+	router.POST("/", middleware.JWTMiddleware(), a.Create)
+	router.PUT("/:id", middleware.JWTMiddleware(), a.Update)
+	router.DELETE("/:id", middleware.JWTMiddleware(), a.Delete)
+	router.GET("/:id", middleware.JWTMiddleware(), a.GetByID)
+	router.GET("/", middleware.JWTMiddleware(), a.GetAll)
 	return nil
 }
 
@@ -136,7 +137,16 @@ func (a *AuthorRoutes) GetByID(ctx *gin.Context) {
 		return
 	}
 
-	utils.ResponseSuccess(ctx, http.StatusOK, author)
+	authorOutput := dto.AuthorOutput{
+		ID:        author.Id,
+		Name:      author.Name,
+		Email:     author.Email,
+		Bio:       author.Bio,
+		CreatedAt: author.CreatedAt.AsTime().Format(time.RFC3339),
+		UpdatedAt: author.UpdatedAt.AsTime().Format(time.RFC3339),
+	}
+
+	utils.ResponseSuccess(ctx, http.StatusOK, authorOutput)
 }
 
 func (a *AuthorRoutes) GetAll(ctx *gin.Context) {
@@ -145,5 +155,16 @@ func (a *AuthorRoutes) GetAll(ctx *gin.Context) {
 		utils.ResponseError(ctx, http.StatusInternalServerError, err)
 		return
 	}
-	utils.ResponseSuccess(ctx, http.StatusOK, authors)
+	var author []dto.AuthorOutput
+	for _, v := range authors.Authors {
+		author = append(author, dto.AuthorOutput{
+			ID:        v.Id,
+			Name:      v.Name,
+			Email:     v.Email,
+			Bio:       v.Bio,
+			CreatedAt: v.CreatedAt.AsTime().Format(time.RFC3339),
+			UpdatedAt: v.UpdatedAt.AsTime().Format(time.RFC3339),
+		})
+	}
+	utils.ResponseSuccess(ctx, http.StatusOK, author)
 }

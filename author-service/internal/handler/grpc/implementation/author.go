@@ -29,6 +29,8 @@ func (u *Author) GetByID(ctx context.Context, arg *pb.GetByIDRequest) (*pb.Autho
 	return &pb.Author{
 		Id:        author.ID,
 		Name:      author.Name,
+		Email:     author.Email,
+		Bio:       author.Bio,
 		CreatedAt: timestamppb.New(author.CreatedAt),
 		UpdatedAt: timestamppb.New(author.UpdatedAt),
 	}, nil
@@ -82,6 +84,8 @@ func (u *Author) ListAll(ctx context.Context, in *emptypb.Empty) (*pb.ListAuthor
 	for _, author := range authors {
 		authorResponses = append(authorResponses, &pb.Author{
 			Id:        author.ID,
+			Email:     author.Email,
+			Bio:       author.Bio,
 			Name:      author.Name,
 			CreatedAt: timestamppb.New(author.CreatedAt),
 			UpdatedAt: timestamppb.New(author.UpdatedAt),

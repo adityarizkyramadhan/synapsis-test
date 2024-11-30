@@ -111,7 +111,17 @@ func (c *CategoryRoutes) GetAll(ctx *gin.Context) {
 		return
 	}
 
-	utils.ResponseSuccess(ctx, http.StatusOK, res)
+	var resCategory []*dto.CategoryOutput
+	for _, category := range res.Categories {
+		resCategory = append(resCategory, &dto.CategoryOutput{
+			ID:        category.Id,
+			Name:      category.Name,
+			CreatedAt: category.CreatedAt.AsTime().Format("2006-01-02 15:04:05"),
+			UpdatedAt: category.UpdatedAt.AsTime().Format("2006-01-02 15:04:05"),
+		})
+	}
+
+	utils.ResponseSuccess(ctx, http.StatusOK, resCategory)
 }
 
 func (c *CategoryRoutes) GetByID(ctx *gin.Context) {
@@ -130,5 +140,12 @@ func (c *CategoryRoutes) GetByID(ctx *gin.Context) {
 		return
 	}
 
-	utils.ResponseSuccess(ctx, http.StatusOK, res)
+	resCategory := &dto.CategoryOutput{
+		ID:        res.Id,
+		Name:      res.Name,
+		CreatedAt: res.CreatedAt.AsTime().Format("2006-01-02 15:04:05"),
+		UpdatedAt: res.UpdatedAt.AsTime().Format("2006-01-02 15:04:05"),
+	}
+
+	utils.ResponseSuccess(ctx, http.StatusOK, resCategory)
 }

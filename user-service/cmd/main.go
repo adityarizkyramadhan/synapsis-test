@@ -39,7 +39,7 @@ func main() {
 	grpcHandler := grpcImplementation.NewUser(serviceUser)
 	grpcServer := grpc.NewServer()
 	pb.RegisterUserHandlerServer(grpcServer, grpcHandler)
-	listener, err := net.Listen("tcp", os.Getenv("GRPC_PORT"))
+	listener, err := net.Listen("tcp", ":"+os.Getenv("GRPC_PORT"))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
