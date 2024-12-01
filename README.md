@@ -63,6 +63,14 @@ sequenceDiagram
     API Gateway -->> User: Response
 ```
 
+Link Postman:
+```
+https://bold-trinity-904712.postman.co/workspace/5f93435f-a044-4476-8e9d-d6270c4700fc/overview
+```
+
+## How to run
+1. Clone this repository
+2. Run `docker-compose up -d` to start the PostgreSQL and Redis
 
 
 
