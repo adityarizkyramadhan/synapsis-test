@@ -61,6 +61,12 @@ func main() {
 		log.Fatalf("failed to initialize borrowing handler: %v", err)
 	}
 
+	recommendationGroup := router.Group("/recommendation")
+	recommendationHandler := httpHandler.NewRecommendationRoutes()
+	if err := recommendationHandler.Init(recommendationGroup); err != nil {
+		log.Fatalf("failed to initialize recommendation handler: %v", err)
+	}
+
 	srv := &http.Server{
 		Addr:    ":8080",
 		Handler: router,
