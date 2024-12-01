@@ -10,7 +10,7 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o user-service ./cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o book-service ./cmd/main.go
 
 FROM alpine:3.14
 
@@ -18,10 +18,10 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /app
 
-COPY --from=builder /app/user-service .
+COPY --from=builder /app/book-service .
 
 COPY .env .env
 
-EXPOSE 50051
+EXPOSE 50054
 
-CMD ["./user-service"]
+CMD ["./book-service"]

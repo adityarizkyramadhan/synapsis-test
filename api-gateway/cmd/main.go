@@ -77,7 +77,7 @@ func main() {
 			log.Fatalf("listen: %s\n", err)
 		}
 	}()
-	log.Printf("Server started on port %s\n", os.Getenv("PORT"))
+	log.Printf("Server started on port %s\n", os.Getenv("HTTP_PORT"))
 
 	// Wait for interrupt signal to gracefully shutdown the server
 	quit := make(chan os.Signal, 1)

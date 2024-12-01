@@ -1,0 +1,133 @@
+version: "3.8"
+
+volumes:
+  postgres_data_bookservice:
+  postgres_data_authorservice:
+  postgres_data_categoryservice:
+  postgres_data_userservice:
+
+services:
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: "postgres:alpine"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data_bookservice:/var/lib/postgresql/data/bookservice
+      - postgres_data_authorservice:/var/lib/postgresql/data/authorservice
+      - postgres_data_categoryservice:/var/lib/postgresql/data/categoryservice
+      - postgres_data_userservice:/var/lib/postgresql/data/userservice
+
+  bookservice:
+    build: ./book-service
+    depends_on:
+      - redis
+      - postgres
+    environment:
+      # Redis Configuration
+      REDIS_ADDR: "redis:6379"
+      REDIS_PASSWORD: ""
+
+      # Database Configuration
+      DB_HOST: "postgres"
+      DB_USER: "postgres"
+      DB_PASSWORD: "root"
+      DB_NAME: "book_database"
+      DB_PORT: "5432"
+
+      # GRPC Configuration
+      GRPC_PORT: "50051"
+    ports:
+      - "50051:50051"
+
+  authorservice:
+    build: ./author-service
+    depends_on:
+      - redis
+      - postgres
+    environment:
+      # Redis Configuration
+      REDIS_ADDR: "redis:6379"
+      REDIS_PASSWORD: ""
+
+      # Database Configuration
+      DB_HOST: "postgres"
+      DB_USER: "postgres"
+      DB_PASSWORD: "root"
+      DB_NAME: "author_database"
+      DB_PORT: "5432"
+
+      # GRPC Configuration
+      GRPC_PORT: "50052"
+    ports:
+      - "50052:50052"
+
+  categoryservice:
+    build: ./category-service
+    depends_on:
+      - redis
+      - postgres
+    environment:
+      # Redis Configuration
+      REDIS_ADDR: "redis:6379"
+      REDIS_PASSWORD: ""
+
+      # Database Configuration
+      DB_HOST: "postgres"
+      DB_USER: "postgres"
+      DB_PASSWORD: "root"
+      DB_NAME: "category_database"
+      DB_PORT: "5432"
+
+      # GRPC Configuration
+      GRPC_PORT: "50053"
+    ports:
+      - "50053:50053"
+
+  userservice:
+    build: ./user-service
+    depends_on:
+      - redis
+      - postgres
+    environment:
+      # Redis Configuration
+      REDIS_ADDR: "redis:6379"
+      REDIS_PASSWORD: ""
+
+      # Database Configuration
+      DB_HOST: "postgres"
+      DB_USER: "postgres"
+      DB_PASSWORD: "root"
+      DB_NAME: "user_database"
+      DB_PORT: "5432"
+
+      # GRPC Configuration
+      GRPC_PORT: "50054"
+    ports:
+      - "50054:50054"
+
+  api-gateway:
+    build: ./api-gateway
+    depends_on:
+      - bookservice
+      - authorservice
+      - categoryservice
+      - userservice
+    ports:
+      - "8080:8080"
+    environment:
+      # Application Secret Key
+      SECRET_KEY: "secret-key-gatau-males-mikir-aku"
+
+      # Service GRPC URLs
+      URL_AUTHOR: "authorservice:50052"
+      URL_BOOK: "bookservice:50051"
+      URL_CATEGORY: "categoryservice:50053"
+      URL_USER: "userservice:50054"
