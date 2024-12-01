@@ -11,15 +11,12 @@ Library books management system using GRPC and Golang with PostgreSQL database a
 
 ## Usecase Diagram
 ```mermaid
-usecase
-actor User as "User"
-rectangle "System" {
-    User --> (API Gateway)
-    (API Gateway) --> (Book Service)
-    (API Gateway) --> (Author Service)
-    (API Gateway) --> (Category Service)
-    (API Gateway) --> (User Service)
-}
+graph TD
+    User["User"] --> APIGateway["API Gateway"]
+    APIGateway --> BookService["Book Service"]
+    APIGateway --> AuthorService["Author Service"]
+    APIGateway --> CategoryService["Category Service"]
+    APIGateway --> UserService["User Service"]
 ```
 
 ## Sequence Diagram Book Service
