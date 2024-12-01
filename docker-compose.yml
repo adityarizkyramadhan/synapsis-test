@@ -43,9 +43,9 @@ services:
       DB_PORT: "5432"
 
       # GRPC Configuration
-      GRPC_PORT: "50051"
+      GRPC_PORT: "50054"
     ports:
-      - "50051:50051"
+      - "50054:50054"
 
   authorservice:
     build: ./author-service
@@ -109,9 +109,9 @@ services:
       DB_PORT: "5432"
 
       # GRPC Configuration
-      GRPC_PORT: "50054"
+      GRPC_PORT: "50051"
     ports:
-      - "50054:50054"
+      - "50051:50051"
 
   api-gateway:
     build: ./api-gateway
@@ -124,10 +124,13 @@ services:
       - "8080:8080"
     environment:
       # Application Secret Key
-      SECRET_KEY: "secret-key-gatau-males-mikir-aku"
+      SECRET_KEY: "your-secret-key"
 
       # Service GRPC URLs
       URL_AUTHOR: "authorservice:50052"
-      URL_BOOK: "bookservice:50051"
+      URL_BOOK: "bookservice:50054"
       URL_CATEGORY: "categoryservice:50053"
-      URL_USER: "userservice:50054"
+      URL_USER: "userservice:50051"
+
+      # GRPC Configuration
+      HTTP_PORT: "8080"
