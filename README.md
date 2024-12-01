@@ -11,28 +11,18 @@ Library books management system using GRPC and Golang with PostgreSQL database a
 
 ## Usecase Diagram
 ```mermaid
-       +------------------+
-       |    User          |
-       +------------------+
-                 |
-                 v
-       +------------------+
-       |  API Gateway     |
-       +------------------+
-           |    |    |    |
-           v    v    v    v
-+---------+ +------+ +------+ +-------+
-| Book    | |Author| |Category| |User  |
-| Service | |Service| |Service | |Service|
-+---------+ +------+ +------+ +-------+
-            |    |    |    |
-            v    v    v    v
-        +------------------+
-        |    Database      |
-        +------------------+
-  ```
+usecase
+actor User as "User"
+rectangle "System" {
+    User --> (API Gateway)
+    (API Gateway) --> (Book Service)
+    (API Gateway) --> (Author Service)
+    (API Gateway) --> (Category Service)
+    (API Gateway) --> (User Service)
+}
+```
 
-## Sequence Diagram
+## Sequence Diagram Book Service
 ```mermaid
 sequenceDiagram
     User ->> API Gateway: Request
@@ -42,6 +32,42 @@ sequenceDiagram
     Book Service -->> API Gateway: Response
     API Gateway -->> User: Response
 ```
+
+## Sequence Diagram Author Service
+```mermaid
+sequenceDiagram
+    User ->> API Gateway: Request
+    API Gateway ->> Author Service: Request
+    Author Service ->> Database: Request
+    Database -->> Author Service: Response
+    Author Service -->> API Gateway: Response
+    API Gateway -->> User: Response
+```
+
+## Sequence Diagram Category Service
+```mermaid
+sequenceDiagram
+    User ->> API Gateway: Request
+    API Gateway ->> Category Service: Request
+    Category Service ->> Database: Request
+    Database -->> Category Service: Response
+    Category Service -->> API Gateway: Response
+    API Gateway -->> User: Response
+```
+
+## Sequence Diagram User Service
+```mermaid
+sequenceDiagram
+    User ->> API Gateway: Request
+    API Gateway ->> User Service: Request
+    User Service ->> Database: Request
+    Database -->> User Service: Response
+    User Service -->> API Gateway: Response
+    API Gateway -->> User: Response
+```
+
+
+
 
 
 
