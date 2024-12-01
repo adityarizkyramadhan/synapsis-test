@@ -44,6 +44,11 @@ func main() {
 	grpcHandlerBorrowing := grpcImplementation.NewBorrowing(serviceBorrowing)
 	pbBook.RegisterBorrowingHandlerServer(grpcServer, grpcHandlerBorrowing)
 
+	repoRecommendation := repository.NewRecommendation(db)
+	serviceRecommendation := service.NewRecommendation(repoRecommendation)
+	grpcHandlerRecommendation := grpcImplementation.NewRecommendation(serviceRecommendation)
+	pbBook.RegisterRecommendationHandlerServer(grpcServer, grpcHandlerRecommendation)
+
 	listener, err := net.Listen("tcp", ":"+os.Getenv("GRPC_PORT"))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)

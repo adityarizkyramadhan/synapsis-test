@@ -1,14 +1,16 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/adityarizkyramadhan/synapsis-test/book-service/internal/model"
 	"gorm.io/gorm"
 )
 
 type RecommendationRepository interface {
-	GetRecommendationUserByAuthor(userID string) ([]model.Book, error)
-	GetRecommendationUserByCategory(userID string) ([]model.Book, error)
-	GetRecommendationUserByTitle(userID string) ([]model.Book, error)
+	GetRecommendationUserByAuthor(ctx context.Context, userID uint32) ([]model.Book, error)
+	GetRecommendationUserByCategory(ctx context.Context, userID uint32) ([]model.Book, error)
+	GetRecommendationUserByTitle(ctx context.Context, userID uint32) ([]model.Book, error)
 }
 
 type recommendationRepository struct {
@@ -19,14 +21,9 @@ func NewRecommendation(db *gorm.DB) RecommendationRepository {
 	return &recommendationRepository{db}
 }
 
-func (r *recommendationRepository) GetRecommendationUserByAuthor(userID string) ([]model.Book, error) {
-	// Ambil preferensi dari borrowing yang dilakukan user
-	// Ambil semua buku yang dipinjam oleh user
-	// Ambil semua buku yang dipinjam oleh user yang memiliki author yang sama
-	// Rekomendasikan bedasarkan buku yang dipinjam oleh user yang memiliki author yang sama dan terbanyak
-
+func (r *recommendationRepository) GetRecommendationUserByAuthor(ctx context.Context, userID uint32) ([]model.Book, error) {
 	var borrow []model.Borrowing
-	if err := r.db.Where("user_id = ?", userID).Find(&borrow).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Find(&borrow).Error; err != nil {
 		return nil, err
 	}
 
@@ -36,7 +33,7 @@ func (r *recommendationRepository) GetRecommendationUserByAuthor(userID string) 
 	}
 
 	var books []model.Book
-	if err := r.db.Where("id IN ?", bookIDs).Find(&books).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("id IN ?", bookIDs).Find(&books).Error; err != nil {
 		return nil, err
 	}
 
@@ -46,21 +43,16 @@ func (r *recommendationRepository) GetRecommendationUserByAuthor(userID string) 
 	}
 
 	var booksByAuthor []model.Book
-	if err := r.db.Where("author_id IN ?", authorIDs).Find(&booksByAuthor).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("author_id IN ?", authorIDs).Find(&booksByAuthor).Error; err != nil {
 		return nil, err
 	}
 
 	return booksByAuthor, nil
 }
 
-func (r *recommendationRepository) GetRecommendationUserByCategory(userID string) ([]model.Book, error) {
-	// Ambil preferensi dari borrowing yang dilakukan user
-	// Ambil semua buku yang dipinjam oleh user
-	// Ambil semua buku yang dipinjam oleh user yang memiliki category yang sama
-	// Rekomendasikan bedasarkan buku yang dipinjam oleh user yang memiliki category yang sama dan terbanyak
-
+func (r *recommendationRepository) GetRecommendationUserByCategory(ctx context.Context, userID uint32) ([]model.Book, error) {
 	var borrow []model.Borrowing
-	if err := r.db.Where("user_id = ?", userID).Find(&borrow).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Find(&borrow).Error; err != nil {
 		return nil, err
 	}
 
@@ -70,12 +62,12 @@ func (r *recommendationRepository) GetRecommendationUserByCategory(userID string
 	}
 
 	var books []model.Book
-	if err := r.db.Where("id IN ?", bookIDs).Find(&books).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("id IN ?", bookIDs).Find(&books).Error; err != nil {
 		return nil, err
 	}
 
 	var categoryBooks []model.CategoryBook
-	if err := r.db.Where("book_id IN ?", bookIDs).Find(&categoryBooks).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("book_id IN ?", bookIDs).Find(&categoryBooks).Error; err != nil {
 		return nil, err
 	}
 
@@ -85,21 +77,16 @@ func (r *recommendationRepository) GetRecommendationUserByCategory(userID string
 	}
 
 	var booksByCategory []model.Book
-	if err := r.db.Where("category_id IN ?", categoryIDs).Find(&booksByCategory).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("category_id IN ?", categoryIDs).Find(&booksByCategory).Error; err != nil {
 		return nil, err
 	}
 
 	return booksByCategory, nil
 }
 
-func (r *recommendationRepository) GetRecommendationUserByTitle(userID string) ([]model.Book, error) {
-	// Ambil preferensi dari borrowing yang dilakukan user
-	// Ambil semua buku yang dipinjam oleh user
-	// Ambil semua buku yang dipinjam oleh user yang memiliki title yang sama
-	// Rekomendasikan bedasarkan buku yang dipinjam oleh user yang memiliki title yang sama dan terbanyak
-
+func (r *recommendationRepository) GetRecommendationUserByTitle(ctx context.Context, userID uint32) ([]model.Book, error) {
 	var borrow []model.Borrowing
-	if err := r.db.Where("user_id = ?", userID).Find(&borrow).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Find(&borrow).Error; err != nil {
 		return nil, err
 	}
 
@@ -109,7 +96,7 @@ func (r *recommendationRepository) GetRecommendationUserByTitle(userID string) (
 	}
 
 	var books []model.Book
-	if err := r.db.Where("id IN ?", bookIDs).Find(&books).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("id IN ?", bookIDs).Find(&books).Error; err != nil {
 		return nil, err
 	}
 

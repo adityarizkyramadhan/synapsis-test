@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package grpc;
+
+option go_package = "./grpc";
+
+service RecommendationHandler {
+  rpc GetRecommendationUserByAuthor(GetRecommendationRequest) returns (RecommendationResponse) {}
+  rpc GetRecommendationUserByCategory(GetRecommendationRequest) returns (RecommendationResponse) {}
+  rpc GetRecommendationUserByTitle(GetRecommendationRequest) returns (RecommendationResponse) {}
+}
+
+message GetRecommendationRequest {
+  uint32 user_id = 1; // ID pengguna yang akan mendapatkan rekomendasi
+}
+
+message BookRecommendation {
+  uint32 id = 1;
+  string title = 2;
+  uint32 author_id = 3;
+  string description = 4;
+  uint32 year = 5;
+  uint32 total = 6;
+  uint32 available = 7;
+}
+
+message RecommendationResponse {
+  repeated BookRecommendation books = 1; // Daftar buku yang direkomendasikan
+}
