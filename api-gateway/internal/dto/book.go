@@ -7,3 +7,14 @@ type BookInput struct {
 	Year        uint32 `json:"year" binding:"required"`
 	Stock       uint32 `json:"stock" binding:"required"`
 }
+
+type BookOutput struct {
+	ID          uint32 `json:"id"`
+	Title       string `json:"title"`
+	AuthorID    uint32 `json:"author_id"`
+	Description string `json:"description"`
+	Year        uint32 `json:"year"`
+	Stock       uint32 `json:"stock"`
+	CreatedAt   string `json:"created_at"`
+	UpdatedAt   string `json:"updated_at"`
+}

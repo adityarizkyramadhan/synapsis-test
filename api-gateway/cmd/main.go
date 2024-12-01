@@ -19,6 +19,7 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("failed to load env")
 	}
+
 	router := gin.New()
 
 	userGroup := router.Group("/user")

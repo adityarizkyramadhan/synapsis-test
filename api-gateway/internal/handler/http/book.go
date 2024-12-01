@@ -23,7 +23,7 @@ func NewBookRoutes() *BookRoutes {
 }
 
 func (b *BookRoutes) Init(router *gin.RouterGroup) error {
-	conn, err := grpc.NewClient("localhost:50053", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("localhost:50054", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
 	}
@@ -130,7 +130,18 @@ func (b *BookRoutes) GetByID(ctx *gin.Context) {
 		return
 	}
 
-	utils.ResponseSuccess(ctx, http.StatusOK, book)
+	bookDto := dto.BookOutput{
+		ID:          book.Id,
+		Title:       book.Title,
+		AuthorID:    book.AuthorId,
+		Description: book.Description,
+		Year:        book.Year,
+		Stock:       book.Stock,
+		CreatedAt:   book.CreatedAt.AsTime().Format("2006-01-02 15:04:05"),
+		UpdatedAt:   book.UpdatedAt.AsTime().Format("2006-01-02 15:04:05"),
+	}
+
+	utils.ResponseSuccess(ctx, http.StatusOK, bookDto)
 }
 
 func (b *BookRoutes) GetAll(ctx *gin.Context) {
@@ -140,5 +151,19 @@ func (b *BookRoutes) GetAll(ctx *gin.Context) {
 		return
 	}
 
-	utils.ResponseSuccess(ctx, http.StatusOK, res)
+	var books []*dto.BookOutput
+	for _, book := range res.Books {
+		books = append(books, &dto.BookOutput{
+			ID:          book.Id,
+			Title:       book.Title,
+			AuthorID:    book.AuthorId,
+			Description: book.Description,
+			Year:        book.Year,
+			Stock:       book.Stock,
+			CreatedAt:   book.CreatedAt.AsTime().Format("2006-01-02 15:04:05"),
+			UpdatedAt:   book.UpdatedAt.AsTime().Format("2006-01-02 15:04:05"),
+		})
+	}
+
+	utils.ResponseSuccess(ctx, http.StatusOK, books)
 }
