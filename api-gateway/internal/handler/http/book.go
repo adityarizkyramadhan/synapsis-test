@@ -3,6 +3,7 @@ package http
 import (
 	"errors"
 	"net/http"
+	"os"
 	"strconv"
 
 	pbBook "github.com/adityarizkyramadhan/synapsis-test/api-gateway/internal/client/book/grpc"
@@ -23,7 +24,7 @@ func NewBookRoutes() *BookRoutes {
 }
 
 func (b *BookRoutes) Init(router *gin.RouterGroup) error {
-	conn, err := grpc.NewClient("localhost:50054", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(os.Getenv("URL_BOOK"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
 	}
