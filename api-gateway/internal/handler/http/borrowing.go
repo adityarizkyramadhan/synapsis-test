@@ -41,8 +41,8 @@ func (b *Borrowing) Borrow(ctx *gin.Context) {
 		return
 	}
 
-	userId := ctx.MustGet("id").(string)
-	userIdInt, _ := strconv.ParseUint(userId, 10, 64)
+	userId := ctx.MustGet("id").(float64)
+	userIdInt := int64(userId)
 
 	_, err := b.borrowingClient.Borrow(ctx, &pbBorrowing.BorrowRequest{
 		BookId: input.BookID,
@@ -65,8 +65,8 @@ func (b *Borrowing) Return(ctx *gin.Context) {
 		return
 	}
 
-	userId := ctx.MustGet("id").(string)
-	userIdInt, _ := strconv.ParseUint(userId, 10, 64)
+	userId := ctx.MustGet("id").(float64)
+	userIdInt := int64(userId)
 
 	_, err = b.borrowingClient.Return(ctx, &pbBorrowing.ReturnRequest{
 		BorrowingId: uint32(id),
