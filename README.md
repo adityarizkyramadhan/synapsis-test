@@ -12,10 +12,11 @@ Library books management system using GRPC and Golang with PostgreSQL database a
 ## Entity Relationship Diagram
 ```mermaid
 erDiagram
-    USER ||--o| BORROW_BOOK : "borrow"
-    BORROW_BOOK ||--| BOOK : "borrow"
-    BOOK ||--| AUTHOR : "written by"
-    BOOK ||--| CATEGORY : "categorized by"
+    USER ||--o{ BORROW_BOOK : "borrow"
+    BORROW_BOOK }o--|| BOOK : "belongs to"
+    BOOK ||--o{ AUTHOR : "written by"
+    BOOK ||--o{ CATEGORY : "categorized by"
+
     USER {
         string username
         string password
