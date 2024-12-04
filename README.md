@@ -9,6 +9,46 @@ Library books management system using GRPC and Golang with PostgreSQL database a
 - Management of borrow books
 - Recommendation system based on user borrowing history
 
+## Entity Relationship Diagram
+```mermaid
+erDiagram
+    USER ||--o| BORROW_BOOK : "borrow"
+    BORROW_BOOK ||--| BOOK : "borrow"
+    BOOK ||--| AUTHOR : "written by"
+    BOOK ||--| CATEGORY : "categorized by"
+    USER {
+        string username
+        string password
+        string email
+    }
+    BORROW_BOOK {
+        string id
+        string user_id
+        string book_id
+        date borrow_date
+        date return_date
+    }
+    BOOK {
+        string id
+        string title
+        string description
+        string author_id
+        string category_id
+        int stock
+    }
+    AUTHOR {
+        string id
+        string name
+    }
+    CATEGORY {
+        string id
+        string name
+    }
+```
+
+![ERD](erd.png)
+
+
 ## Usecase Diagram
 ```mermaid
 graph TD
@@ -71,8 +111,5 @@ https://bold-trinity-904712.postman.co/workspace/5f93435f-a044-4476-8e9d-d6270c4
 ## How to run
 1. Clone this repository
 2. Run `docker-compose up -d` to start the PostgreSQL and Redis
-
-
-
 
 
