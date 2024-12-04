@@ -14,8 +14,8 @@ Library books management system using GRPC and Golang with PostgreSQL database a
 erDiagram
     USER ||--o{ BORROW_BOOK : "borrow"
     BORROW_BOOK }o--|| BOOK : "belongs to"
-    BOOK ||--o{ AUTHOR : "written by"
-    BOOK ||--o{ CATEGORY : "categorized by"
+    BOOK ||--o{ BOOK_CATEGORY : "categorized in"
+    CATEGORY ||--o{ BOOK_CATEGORY : "contains"
 
     USER {
         string username
@@ -34,12 +34,11 @@ erDiagram
         string title
         string description
         string author_id
-        string category_id
         int stock
     }
-    AUTHOR {
-        string id
-        string name
+    BOOK_CATEGORY {
+        string book_id
+        string category_id
     }
     CATEGORY {
         string id
